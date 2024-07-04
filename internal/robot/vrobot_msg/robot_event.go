@@ -1,4 +1,4 @@
-package message
+package vrobot_msg
 
 type ReportedEvent struct {
 	Header  Header                 `json:"header"`

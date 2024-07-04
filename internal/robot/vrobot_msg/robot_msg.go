@@ -1,4 +1,4 @@
-package message
+package vrobot_msg
 
 type BootRobotRequest struct {
 	RobotId int    `json:"robotId"`

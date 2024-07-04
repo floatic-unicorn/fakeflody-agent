@@ -3,7 +3,7 @@ package vrobot
 import (
 	"encoding/json"
 	"fakeflody-agent/config"
-	"fakeflody-agent/internal/robot/message"
+	msg "fakeflody-agent/internal/robot/vrobot_msg"
 	"fakeflody-agent/logger"
 	"fakeflody-agent/utils/hashids"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
@@ -15,7 +15,7 @@ type ReportedEvent interface {
 	EStop(robotId int)
 	UnPauseSuccess(robotId int)
 	UnPauseFail(robotId int)
-	SendReport(event *message.ReportedEvent)
+	SendReport(event *msg.ReportedEvent)
 	Close()
 }
 
@@ -46,12 +46,12 @@ func (c *ReportedProducer) AddRobot(robot *VRobotInfo) {
 
 func (c *ReportedProducer) EStop(robotId int) {
 
-	receiveState := message.EMERGENCY_STOPPED
+	receiveState := msg.EMERGENCY_STOPPED
 
-	eventMessage := &message.ReportedEvent{
-		Header: message.Header{
+	eventMessage := &msg.ReportedEvent{
+		Header: msg.Header{
 			TimeStamp: time.Now().UnixMilli(),
-			Type:      message.REPORT.String(),
+			Type:      msg.REPORT.String(),
 			RobotId:   hashids.ToUid(robotId),
 		},
 		Payload: map[string]interface{}{
@@ -66,13 +66,13 @@ func (c *ReportedProducer) EStop(robotId int) {
 
 func (c *ReportedProducer) UnPauseSuccess(robotId int) {
 
-	receiveState := message.RECOVERED_FROM_EMERGENCY_STOP
+	receiveState := msg.RECOVERED_FROM_EMERGENCY_STOP
 
-	eventMessage := &message.ReportedEvent{
-		Header: message.Header{
+	eventMessage := &msg.ReportedEvent{
+		Header: msg.Header{
 			CommandId: c.robot.LatestCommandId,
 			TimeStamp: time.Now().UnixMilli(),
-			Type:      message.REPORT.String(),
+			Type:      msg.REPORT.String(),
 			RobotId:   hashids.ToUid(robotId),
 		},
 		Payload: map[string]interface{}{
@@ -87,13 +87,13 @@ func (c *ReportedProducer) UnPauseSuccess(robotId int) {
 
 func (c *ReportedProducer) UnPauseFail(robotId int) {
 
-	receiveState := message.FAILED_TO_UNPAUSE
+	receiveState := msg.FAILED_TO_UNPAUSE
 
-	eventMessage := &message.ReportedEvent{
-		Header: message.Header{
+	eventMessage := &msg.ReportedEvent{
+		Header: msg.Header{
 			CommandId: c.robot.LatestCommandId,
 			TimeStamp: time.Now().UnixMilli(),
-			Type:      message.REPORT.String(),
+			Type:      msg.REPORT.String(),
 			RobotId:   hashids.ToUid(robotId),
 		},
 		Payload: map[string]interface{}{
@@ -107,7 +107,7 @@ func (c *ReportedProducer) UnPauseFail(robotId int) {
 	logger.WWarnf("🤖[%v] estop 해제가 필요합니다", robotId)
 }
 
-func (c *ReportedProducer) SendReport(event *message.ReportedEvent) {
+func (c *ReportedProducer) SendReport(event *msg.ReportedEvent) {
 	value, _ := json.Marshal(&event)
 
 	msg := &kafka.Message{

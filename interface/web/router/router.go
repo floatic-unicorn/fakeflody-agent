@@ -2,7 +2,7 @@ package router
 
 import (
 	"fakeflody-agent/interface/agent"
-	"fakeflody-agent/internal/robot/message"
+	"fakeflody-agent/internal/robot/vrobot_msg"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -20,7 +20,11 @@ func Route(
 	// @Success		200		{object}	vrobot.VRobotList
 	// @Router			/v1/robots [get]
 	v1.Get("/robots", func(c fiber.Ctx) error {
-		return c.JSON(client.GetRobots())
+		robots := make([]vrobot_msg.GetRobotResult, len(client.GetRobots()))
+		for i, vrobot := range client.GetRobots() {
+			robots[i] = vrobot.GetInfo()
+		}
+		return c.JSON(robots)
 	})
 	v1.Get("/robots/:robotId", func(c fiber.Ctx) error {
 		robotId := fiber.Params[int](c, "robotId")
@@ -30,11 +34,11 @@ func Route(
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.NewError(fiber.StatusBadRequest, "Not found Robot"))
 		}
 
-		return c.JSON(vrobot)
+		return c.JSON(vrobot.GetInfo())
 	})
 
 	v1.Post("/robots/boot", func(c fiber.Ctx) error {
-		req := new(message.BootRobotRequest)
+		req := new(vrobot_msg.BootRobotRequest)
 		if err := c.Bind().Body(req); err != nil {
 			return err
 		}
@@ -45,11 +49,15 @@ func Route(
 		}
 		client.AddRobot(req.RobotId, req.Memo)
 
-		return c.JSON(client.GetRobots())
+		robots := make([]vrobot_msg.GetRobotResult, len(client.GetRobots()))
+		for i, vrobot := range client.GetRobots() {
+			robots[i] = vrobot.GetInfo()
+		}
+		return c.JSON(robots)
 	})
 
 	v1.Delete("/robots/shutdown", func(c fiber.Ctx) error {
-		req := new(message.ShutDownRobotRequest)
+		req := new(vrobot_msg.ShutDownRobotRequest)
 		if err := c.Bind().Body(req); err != nil {
 			return err
 		}

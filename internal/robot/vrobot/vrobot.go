@@ -2,7 +2,7 @@ package vrobot
 
 import (
 	"fakeflody-agent/config"
-	"fakeflody-agent/internal/robot/message"
+	"fakeflody-agent/internal/robot/vrobot_msg"
 	"fakeflody-agent/logger"
 	"fakeflody-agent/utils"
 	"fakeflody-agent/utils/kafka"
@@ -17,7 +17,7 @@ type VRobot interface {
 	IsReady() bool
 
 	GetRobotId() int
-	GetInfo() message.GetRobotResult
+	GetInfo() vrobot_msg.GetRobotResult
 
 	UpdateState(state string, LatestCommandId *string)
 	SetCommandId(LatestCommandId *string)
@@ -29,9 +29,9 @@ type VRobot interface {
 type VRobotInfo struct {
 	RobotId          int                     `json:"robotId"`
 	RobotName        string                  `json:"robotName"`
-	EmrgencyStop     RobotEmargencyStopState `json:"emrgencyStop"`
+	EmergencyStop    RobotEmergencyStopState `json:"emergencyStop"`
 	State            string                  `json:"state"`
-	LatestCommandId  *string                 `json:"latestCommandId;omitempty"`
+	LatestCommandId  *string                 `json:"latestCommandId"`
 	Memo             string                  `json:"memo"`
 	SessionStartedAt time.Time               `json:"sessionStartedAt"`
 
@@ -42,7 +42,7 @@ type VRobotInfo struct {
 }
 
 // 에러 상태
-type RobotEmargencyStopState struct {
+type RobotEmergencyStopState struct {
 	Estop     bool     `json:"estop"`
 	Solutions []string `json:"solutions"`
 	Problems  []string `json:"problems"`
@@ -74,7 +74,7 @@ func NewRobot(robotId int, robotName string, memo string, cnf *config.FakeFlodyC
 		desiredEvent:   desiredConsumer,
 		operationEvent: operationConsumer,
 		reportedEvent:  reportedProducer,
-		EmrgencyStop: RobotEmargencyStopState{
+		EmergencyStop: RobotEmergencyStopState{
 			Estop:     false,
 			Solutions: []string{},
 			Problems:  []string{},
@@ -109,21 +109,21 @@ func (r *VRobotInfo) SetCommandId(LatestCommandId *string) {
 }
 
 func (r *VRobotInfo) Estop() {
-	r.EmrgencyStop.Estop = true
-	r.EmrgencyStop.Problems = []string{"로봇에 문제가 발생했습니다."}
-	r.EmrgencyStop.Solutions = []string{"문제를 해결해주세요."}
+	r.EmergencyStop.Estop = true
+	r.EmergencyStop.Problems = []string{"로봇에 문제가 발생했습니다."}
+	r.EmergencyStop.Solutions = []string{"문제를 해결해주세요."}
 	r.reportedEvent.EStop(r.RobotId)
 }
 
 func (r *VRobotInfo) ClearEstop() {
-	r.EmrgencyStop.Estop = false
-	r.EmrgencyStop.Problems = []string{}
-	r.EmrgencyStop.Solutions = []string{}
+	r.EmergencyStop.Estop = false
+	r.EmergencyStop.Problems = []string{}
+	r.EmergencyStop.Solutions = []string{}
 }
 
 func (r *VRobotInfo) Recover() {
-	r.EmrgencyStop.Problems = []string{}
-	r.EmrgencyStop.Solutions = []string{}
+	r.EmergencyStop.Problems = []string{}
+	r.EmergencyStop.Solutions = []string{}
 
 	if r.IsReady() {
 		r.reportedEvent.UnPauseSuccess(r.RobotId)
@@ -133,19 +133,19 @@ func (r *VRobotInfo) Recover() {
 }
 
 func (r *VRobotInfo) IsReady() bool {
-	return r.EmrgencyStop.Estop == false
+	return r.EmergencyStop.Estop == false
 }
 
-func (r *VRobotInfo) GetInfo() message.GetRobotResult {
+func (r *VRobotInfo) GetInfo() vrobot_msg.GetRobotResult {
 	_, endTime, _ := utils.Cache.GetWithExpiration(strconv.Itoa(r.RobotId))
-	return message.GetRobotResult{
+	return vrobot_msg.GetRobotResult{
 		RobotId:        r.RobotId,
 		RobotName:      r.RobotName,
 		Memo:           r.Memo,
 		State:          r.State,
-		Estop:          r.EmrgencyStop.Estop,
-		Problems:       r.EmrgencyStop.Problems,
-		Solutions:      r.EmrgencyStop.Solutions,
+		Estop:          r.EmergencyStop.Estop,
+		Problems:       r.EmergencyStop.Problems,
+		Solutions:      r.EmergencyStop.Solutions,
 		SessionStartAt: utils.TimeToStringDateTime(r.SessionStartedAt),
 		SessionEndAt:   utils.TimeToStringDateTime(endTime),
 	}

@@ -2,7 +2,7 @@ package vrobot
 
 import (
 	"fakeflody-agent/config"
-	"fakeflody-agent/internal/robot/message"
+	"fakeflody-agent/internal/robot/vrobot_msg"
 	"fakeflody-agent/logger"
 	kafkautil "fakeflody-agent/utils/kafka"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
@@ -43,13 +43,13 @@ func (c *DesiredConsumer) AddRobot(robot *VRobotInfo) {
 
 func (c *DesiredConsumer) Subscribe() {
 	logger.Infof("[%s] 해당 토픽을 구독합니다.", c.topic)
-	kafkautil.Subscribe(c.topic, c.desiredConsumer, func(msg *message.DesiredEvent) {
+	kafkautil.Subscribe(c.topic, c.desiredConsumer, func(msg *vrobot_msg.DesiredEvent) {
 		state, ok := msg.Payload["state"]
 		if !ok {
 			return
 		}
-		robotState := message.RobotCommand(state.(string))
-		nextStates := message.NextReports(robotState)
+		robotState := vrobot_msg.RobotCommand(state.(string))
+		nextStates := vrobot_msg.NextReports(robotState)
 
 		for i, state := range nextStates {
 
@@ -67,10 +67,10 @@ func (c *DesiredConsumer) Subscribe() {
 			}
 
 			msg.Header.TimeStamp = time.Now().Unix()
-			msg.Header.Type = message.RESPONSE.String()
+			msg.Header.Type = vrobot_msg.RESPONSE.String()
 			msg.Payload["state"] = state.String()
 
-			c.reportedProducer.SendReport(&message.ReportedEvent{
+			c.reportedProducer.SendReport(&vrobot_msg.ReportedEvent{
 				Header:  msg.Header,
 				Payload: msg.Payload,
 			})

@@ -1,23 +1,23 @@
 ### fakeflody 조회하기
-GET  http://127.0.0.1:3000/fakeflody/v1/robots
+GET  http://127.0.0.1:8080/v1/robots
 
 ### fakeflody 단일 조회하기
-GET  http://127.0.0.1:3000/fakeflody/v1/robots/12000
+GET  http://127.0.0.1:8080/v1/robots/1006
 
 
 ### fakeflody 로봇 실행하기
-POST http://127.0.0.1:3000/fakeflody/v1/robots/boot
+POST http://127.0.0.1:8080/v1/robots/boot
 Content-Type: application/json
 
 {
-  "robotId": 12000,
+  "robotId": 1006,
   "memo": "테스트를 위해 킴"
 }
 
 ### fakeflody 로봇 종료하기
-DELETE http://127.0.0.1:3000/fakeflody/v1/robots/shutdown
+DELETE http://127.0.0.1:8080/v1/robots/shutdown
 Content-Type: application/json
 
 {
-  "robotId": 12000
+  "robotId": 1006
 }

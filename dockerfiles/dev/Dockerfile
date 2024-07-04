@@ -8,9 +8,9 @@ RUN go build ./cmd/fakeflody
 
 FROM alpine:3.20
 
-WORKDIR /app
-
 RUN apk add libc6-compat
+
+WORKDIR /app
 
 COPY --from=builder /build/fakeflody .
 

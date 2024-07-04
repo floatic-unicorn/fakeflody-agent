@@ -1,4 +1,4 @@
-package web
+package router
 
 import (
 	"fakeflody-agent/interface/agent"
@@ -11,8 +11,14 @@ func Route(
 	client agent.FlodyClient,
 ) {
 
-	v1 := api.Group("/fakeflody/v1")
+	v1 := api.Group("/v1")
 
+	// client.GetRobots godoc
+	// @Summary		게시판 등록 API
+	// @Accept		json
+	// @Produce		json
+	// @Success		200		{object}	vrobot.VRobotList
+	// @Router			/v1/robots [get]
 	v1.Get("/robots", func(c fiber.Ctx) error {
 		return c.JSON(client.GetRobots())
 	})

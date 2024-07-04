@@ -14,6 +14,8 @@ const (
 	Version = "1.0.2"
 )
 
+// @title     Fakeflody documentation
+// @BasePath  /
 func main() {
 	app := &cli.App{
 		Name:     Name,

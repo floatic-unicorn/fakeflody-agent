@@ -4,6 +4,7 @@ import (
 	"context"
 	"fakeflody-agent/config"
 	"fakeflody-agent/interface/agent"
+	"fakeflody-agent/interface/web/router"
 	"fakeflody-agent/logger"
 	"fmt"
 	"github.com/gofiber/fiber/v3"
@@ -36,7 +37,9 @@ func Server(
 	logger.Info("Starting Web Server")
 
 	api := NewFiberApiServer(client)
-	Route(api.server, client)
+
+	router.HealthCheckRoute(api.server)
+	router.Route(api.server, client)
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {

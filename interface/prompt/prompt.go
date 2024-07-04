@@ -16,6 +16,19 @@ import (
 	"time"
 )
 
+type ReportCommandKeyword string
+
+func (r ReportCommandKeyword) String() string {
+	return string(r)
+}
+
+const (
+	ActionEstop    ReportCommandKeyword = "estop"
+	ActionALLEstop ReportCommandKeyword = "all-estop"
+	ActionALLClear ReportCommandKeyword = "all-clear"
+	ActionClear    ReportCommandKeyword = "clear"
+)
+
 type Prompt struct {
 	config    *config.FakeFlodyConfig
 	client    agent.FlodyClient
@@ -63,13 +76,13 @@ func (p *Prompt) Run() error {
 		for {
 			chioose := []choose.Choice{
 				{Text: "info", Note: "전체 로봇 정보"},
-				{Text: config.ActionEstop.String(), Note: "e-stop 버튼 누름"},
-				{Text: config.ActionClear.String(), Note: "e-stop 버튼 해제"},
+				{Text: ActionEstop.String(), Note: "e-stop 버튼 누름"},
+				{Text: ActionClear.String(), Note: "e-stop 버튼 해제"},
 			}
 
 			if len(p.client.GetRobots()) > 0 {
-				chioose = append(chioose, choose.Choice{Text: config.ActionALLEstop.String(), Note: "모든 로봇 e-stop"})
-				chioose = append(chioose, choose.Choice{Text: config.ActionALLClear.String(), Note: "모든 로봇 e-stop 해제"})
+				chioose = append(chioose, choose.Choice{Text: ActionALLEstop.String(), Note: "모든 로봇 e-stop"})
+				chioose = append(chioose, choose.Choice{Text: ActionALLClear.String(), Note: "모든 로봇 e-stop 해제"})
 			}
 			chioose = append(chioose, choose.Choice{Text: "exit", Note: "종료"})
 
@@ -86,24 +99,24 @@ func (p *Prompt) Run() error {
 			switch command {
 			case "exit":
 				os.Exit(0)
-			case config.ActionEstop.String():
+			case ActionEstop.String():
 				p.chooseAndActionRobot(func(robotId int) {
 					p.client.GetRobots().GetVRobotById(robotId).Estop()
 					logger.Infof("🕹️%v e-stop을 눌렀습니다.", robotId)
 				})
 
-			case config.ActionClear.String():
+			case ActionClear.String():
 				p.chooseAndActionRobot(func(robotId int) {
 					p.client.GetRobots().GetVRobotById(robotId).ClearEstop()
 					logger.Infof("🕹️비상정지가 해제되었습니다. \n")
 				})
-			case config.ActionALLEstop.String():
+			case ActionALLEstop.String():
 				robots := p.client.GetRobots()
 				for _, robot := range robots {
 					robot.Estop()
 				}
 				logger.Infof("🕹️모든 로봇 e-stop을 눌렀습니다.")
-			case config.ActionALLClear.String():
+			case ActionALLClear.String():
 				robots := p.client.GetRobots()
 				for _, robot := range robots {
 					robot.ClearEstop()

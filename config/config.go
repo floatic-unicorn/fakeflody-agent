@@ -44,3 +44,7 @@ type InterfaceConfig struct {
 	WebConfig WebConfig
 	Cli       bool
 }
+
+type WebConfig struct {
+	Port int
+}

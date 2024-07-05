@@ -100,4 +100,4 @@ jobs:
         helm upgrade -n platform \
           --reuse-values \
           --set image.tag=${{ needs.Build_image_and_push.outputs.tag }} \
-          ${{ env.SERVICE_NAME }}-backend-{{ env.MODE }} chart/${{ env.SERVICE_NAME }}
+          ${{ env.SERVICE_NAME }}-backend-${{ env.MODE }} chart/${{ env.SERVICE_NAME }}

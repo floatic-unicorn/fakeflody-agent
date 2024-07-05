@@ -2,7 +2,6 @@ package kafka
 
 import (
 	"encoding/json"
-	"fakeflody-agent/src/internal/robot/vrobot_msg"
 	"fakeflody-agent/src/logger"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"os"
@@ -10,7 +9,7 @@ import (
 	"syscall"
 )
 
-func Subscribe(topic string, consumer *kafka.Consumer, process func(message *vrobot_msg.DesiredEvent)) {
+func Subscribe[T any](topic string, consumer *kafka.Consumer, process func(message *T)) {
 	err := consumer.Subscribe(topic, nil)
 	if err != nil {
 		logger.Fatalf(err.Error())
@@ -35,13 +34,12 @@ func Subscribe(topic string, consumer *kafka.Consumer, process func(message *vro
 
 			switch e := ev.(type) {
 			case *kafka.Message:
-
-				desiredEvent := &vrobot_msg.DesiredEvent{}
-				err := json.Unmarshal(e.Value, desiredEvent)
+				var desiredEvent T
+				err := json.Unmarshal(e.Value, &desiredEvent)
 				if err != nil {
 					logger.Errorf(err.Error())
 				}
-				process(desiredEvent)
+				process(&desiredEvent)
 
 			case kafka.Error:
 				logger.Infof("Error: %v: %v\n", e.Code(), e)

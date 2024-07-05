@@ -2,7 +2,7 @@ package vrobot
 
 import (
 	config "fakeflody-agent/src/config"
-	"fakeflody-agent/src/internal/robot/vrobot_msg"
+	vrobotmsg "fakeflody-agent/src/internal/robot/vrobot/message"
 	"fakeflody-agent/src/logger"
 	kafkautil "fakeflody-agent/src/utils/kafka"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
@@ -43,21 +43,21 @@ func (c *OperationConsumer) AddRobot(robot *VRobotInfo) {
 
 func (c *OperationConsumer) Subscribe() {
 	logger.Infof("[%s] 해당 토픽을 구독합니다.", c.topic)
-	kafkautil.Subscribe(c.topic, c.desiredConsumer, func(msg *vrobot_msg.DesiredEvent) {
+	kafkautil.Subscribe[vrobotmsg.DesiredEvent](c.topic, c.desiredConsumer, func(msg *vrobotmsg.DesiredEvent) {
 
 		state, ok := msg.Payload["state"]
 		if !ok {
 			return
 		}
-		robotState := vrobot_msg.RobotOperation(state.(string))
+		robotState := vrobotmsg.RobotOperation(state.(string))
 
-		if robotState == vrobot_msg.UNPAUSED {
+		if robotState == vrobotmsg.UNPAUSED {
 			time.Sleep(1 * time.Second)
 
 			logger.WInfof("🤖[%v] 명령을 처리합니다 - %v", c.robot.RobotId, state)
 
 			msg.Header.TimeStamp = time.Now().Unix()
-			msg.Header.Type = vrobot_msg.REPORT.String()
+			msg.Header.Type = vrobotmsg.REPORT.String()
 
 			c.robot.SetCommandId(msg.Header.CommandId)
 			c.robot.Recover()

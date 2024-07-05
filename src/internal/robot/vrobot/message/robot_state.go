@@ -1,4 +1,4 @@
-package vrobot_msg
+package message
 
 // RobotCommand enum
 type RobotCommand string

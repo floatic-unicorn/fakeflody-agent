@@ -2,7 +2,7 @@ package vrobot
 
 import (
 	config "fakeflody-agent/src/config"
-	"fakeflody-agent/src/internal/robot/vrobot_msg"
+	"fakeflody-agent/src/internal/robot/vrobot/message"
 	"fakeflody-agent/src/logger"
 	utils2 "fakeflody-agent/src/utils"
 	"fakeflody-agent/src/utils/kafka"
@@ -17,7 +17,7 @@ type VRobot interface {
 	IsReady() bool
 
 	GetRobotId() int
-	GetInfo() vrobot_msg.GetRobotResult
+	GetInfo() message.GetRobotResult
 
 	UpdateState(state string, LatestCommandId *string)
 	SetCommandId(LatestCommandId *string)
@@ -136,9 +136,9 @@ func (r *VRobotInfo) IsReady() bool {
 	return r.EmergencyStop.Estop == false
 }
 
-func (r *VRobotInfo) GetInfo() vrobot_msg.GetRobotResult {
+func (r *VRobotInfo) GetInfo() message.GetRobotResult {
 	_, endTime, _ := utils2.Cache.GetWithExpiration(strconv.Itoa(r.RobotId))
-	return vrobot_msg.GetRobotResult{
+	return message.GetRobotResult{
 		RobotId:        r.RobotId,
 		RobotName:      r.RobotName,
 		Memo:           r.Memo,

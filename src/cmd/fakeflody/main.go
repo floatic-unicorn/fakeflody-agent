@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fakeflody-agent/config"
-	"fakeflody-agent/logger"
+	"fakeflody-agent/src/config"
+	"fakeflody-agent/src/logger"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 	"os"

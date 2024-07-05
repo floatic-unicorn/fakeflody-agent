@@ -1,11 +1,11 @@
 package vrobot
 
 import (
-	"fakeflody-agent/config"
-	"fakeflody-agent/internal/robot/vrobot_msg"
-	"fakeflody-agent/logger"
-	"fakeflody-agent/utils"
-	"fakeflody-agent/utils/kafka"
+	config "fakeflody-agent/src/config"
+	"fakeflody-agent/src/internal/robot/vrobot_msg"
+	"fakeflody-agent/src/logger"
+	utils2 "fakeflody-agent/src/utils"
+	"fakeflody-agent/src/utils/kafka"
 	"strconv"
 	"time"
 )
@@ -137,7 +137,7 @@ func (r *VRobotInfo) IsReady() bool {
 }
 
 func (r *VRobotInfo) GetInfo() vrobot_msg.GetRobotResult {
-	_, endTime, _ := utils.Cache.GetWithExpiration(strconv.Itoa(r.RobotId))
+	_, endTime, _ := utils2.Cache.GetWithExpiration(strconv.Itoa(r.RobotId))
 	return vrobot_msg.GetRobotResult{
 		RobotId:        r.RobotId,
 		RobotName:      r.RobotName,
@@ -146,8 +146,8 @@ func (r *VRobotInfo) GetInfo() vrobot_msg.GetRobotResult {
 		Estop:          r.EmergencyStop.Estop,
 		Problems:       r.EmergencyStop.Problems,
 		Solutions:      r.EmergencyStop.Solutions,
-		SessionStartAt: utils.TimeToStringDateTime(r.SessionStartedAt),
-		SessionEndAt:   utils.TimeToStringDateTime(endTime),
+		SessionStartAt: utils2.TimeToStringDateTime(r.SessionStartedAt),
+		SessionEndAt:   utils2.TimeToStringDateTime(endTime),
 	}
 }
 

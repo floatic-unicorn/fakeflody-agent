@@ -1,7 +1,7 @@
 package config
 
 import (
-	"fakeflody-agent/logger"
+	"fakeflody-agent/src/logger"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 )
 

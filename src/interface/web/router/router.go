@@ -1,8 +1,8 @@
 package router
 
 import (
-	"fakeflody-agent/interface/agent"
-	"fakeflody-agent/internal/robot/vrobot_msg"
+	"fakeflody-agent/src/interface/agent"
+	"fakeflody-agent/src/internal/robot/vrobot_msg"
 	"github.com/gofiber/fiber/v3"
 )
 

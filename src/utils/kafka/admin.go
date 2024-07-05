@@ -2,7 +2,7 @@ package kafka
 
 import (
 	"context"
-	"fakeflody-agent/logger"
+	"fakeflody-agent/src/logger"
 	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"time"

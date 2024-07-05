@@ -2,9 +2,9 @@ package prompt
 
 import (
 	"context"
-	"fakeflody-agent/config"
-	"fakeflody-agent/interface/agent"
-	"fakeflody-agent/logger"
+	"fakeflody-agent/src/config"
+	"fakeflody-agent/src/interface/agent"
+	"fakeflody-agent/src/logger"
 	"github.com/cqroot/prompt"
 	"github.com/cqroot/prompt/choose"
 	"go.uber.org/fx"

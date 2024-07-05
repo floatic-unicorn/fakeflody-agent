@@ -2,8 +2,8 @@ package kafka
 
 import (
 	"encoding/json"
-	"fakeflody-agent/internal/robot/vrobot_msg"
-	"fakeflody-agent/logger"
+	"fakeflody-agent/src/internal/robot/vrobot_msg"
+	"fakeflody-agent/src/logger"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"os"
 	"os/signal"

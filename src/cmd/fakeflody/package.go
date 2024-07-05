@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fakeflody-agent/config"
-	"fakeflody-agent/interface/agent"
-	"fakeflody-agent/interface/prompt"
-	"fakeflody-agent/interface/web"
-	"fakeflody-agent/thirdparty"
+	"fakeflody-agent/src/config"
+	"fakeflody-agent/src/interface/agent"
+	"fakeflody-agent/src/interface/prompt"
+	"fakeflody-agent/src/interface/web"
+	"fakeflody-agent/src/thirdparty"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/fx"
 )

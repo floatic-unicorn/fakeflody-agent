@@ -2,9 +2,9 @@ package thirdparty
 
 import (
 	"encoding/json"
-	"fakeflody-agent/config"
-	"fakeflody-agent/logger"
-	"fakeflody-agent/utils/hashids"
+	"fakeflody-agent/src/config"
+	"fakeflody-agent/src/logger"
+	"fakeflody-agent/src/utils/hashids"
 	"fmt"
 	"io"
 	"net/http"

@@ -28,6 +28,6 @@ go.work
 env.yaml
 
 fakeflody*
-!cmd/fakeflody*
+!src/cmd/fakeflody*
 
 !fakeflody.http

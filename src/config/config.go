@@ -1,7 +1,7 @@
 package config
 
 import (
-	"fakeflody-agent/utils/hashids"
+	"fakeflody-agent/src/utils/hashids"
 	"fmt"
 )
 

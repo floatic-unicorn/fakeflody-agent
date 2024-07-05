@@ -2,10 +2,10 @@ package web
 
 import (
 	"context"
-	"fakeflody-agent/config"
-	"fakeflody-agent/interface/agent"
-	"fakeflody-agent/interface/web/router"
-	"fakeflody-agent/logger"
+	"fakeflody-agent/src/config"
+	"fakeflody-agent/src/interface/agent"
+	"fakeflody-agent/src/interface/web/router"
+	"fakeflody-agent/src/logger"
 	"fmt"
 	"github.com/gofiber/fiber/v3"
 	"go.uber.org/fx"

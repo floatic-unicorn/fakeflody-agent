@@ -2,10 +2,10 @@ package vrobot
 
 import (
 	"encoding/json"
-	"fakeflody-agent/config"
-	msg "fakeflody-agent/internal/robot/vrobot_msg"
-	"fakeflody-agent/logger"
-	"fakeflody-agent/utils/hashids"
+	config "fakeflody-agent/src/config"
+	msg "fakeflody-agent/src/internal/robot/vrobot_msg"
+	"fakeflody-agent/src/logger"
+	"fakeflody-agent/src/utils/hashids"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"time"
 )

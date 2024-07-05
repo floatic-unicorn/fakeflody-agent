@@ -2,11 +2,11 @@ package agent
 
 import (
 	"context"
-	"fakeflody-agent/config"
-	"fakeflody-agent/internal/robot/vrobot"
-	"fakeflody-agent/logger"
-	"fakeflody-agent/thirdparty"
-	"fakeflody-agent/utils"
+	"fakeflody-agent/src/config"
+	"fakeflody-agent/src/internal/robot/vrobot"
+	"fakeflody-agent/src/logger"
+	"fakeflody-agent/src/thirdparty"
+	"fakeflody-agent/src/utils"
 	"fmt"
 	"github.com/patrickmn/go-cache"
 	"go.uber.org/fx"

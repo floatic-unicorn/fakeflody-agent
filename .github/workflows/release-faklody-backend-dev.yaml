@@ -47,7 +47,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.DOCKER_REPO_URI }}/${{ env.SERVICE_NAME }}-{{ env.MODE }}
+        images: ${{ env.DOCKER_REPO_URI }}/${{ env.SERVICE_NAME }}-${{ env.MODE }}
         tags: |
           type=raw,value={{date 'YYYY-MM-DDTHH-mm' tz='Asia/Seoul'}}
 

@@ -2,9 +2,13 @@ FROM golang:1.22 AS builder
 
 WORKDIR /build
 
-COPY ../../ .
+COPY ../../go.mod ../../go.sum .
 
-RUN go build ./cmd/fakeflody
+COPY ../../docs ./docs
+
+COPY ../../src ./src
+
+RUN go build ./src/cmd/fakeflody
 
 FROM alpine:3.20
 

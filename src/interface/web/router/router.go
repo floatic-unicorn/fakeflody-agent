@@ -11,7 +11,7 @@ func Route(
 	client agent.FlodyClient,
 ) {
 
-	v1 := api.Group("/v1")
+	v1 := api.Group("/api/v1")
 
 	// client.GetRobots godoc
 	// @Summary		게시판 등록 API

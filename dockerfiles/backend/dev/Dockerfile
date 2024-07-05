@@ -2,11 +2,11 @@ FROM golang:1.22 AS builder
 
 WORKDIR /build
 
-COPY ../../go.mod ../../go.sum .
+COPY ../../../go.mod ../../../go.sum .
 
-COPY ../../docs ./docs
+COPY ../../../docs ./docs
 
-COPY ../../src ./src
+COPY ../../../src ./src
 
 RUN go build ./src/cmd/fakeflody
 

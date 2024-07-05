@@ -1,0 +1,103 @@
+name: Build, Push and Deploy - faklody-backend(dev)
+run-name: ${{ github.event.head_commit.message }}
+on:
+  push:
+    branches:
+    - "develop"
+env:
+  DOCKER_REPO_URI: 557571393534.dkr.ecr.ap-northeast-2.amazonaws.com
+  ARTIFACT_RETENTION_DAYS: 3
+  SERVICE_NAME: faklody
+  MODE: dev
+
+jobs:
+  Build_image_and_push:
+    outputs:
+      tag: ${{ steps.set_tag.outputs.tag }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+    - name: Check out
+      uses: actions/checkout@v4
+
+    - name: Save chart
+      uses: actions/upload-artifact@v3
+      with:
+        name: chart
+        path: charts/backend/${{ env.SERVICE_NAME }}
+        retention-days: ${{ env.ARTIFACT_RETENTION_DAYS }}
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::557571393534:role/github-actions
+        aws-region: ap-northeast-2
+
+    - name: Login to Amazon ECR
+      id: login_ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Set image name for container image
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.DOCKER_REPO_URI }}/${{ env.SERVICE_NAME }}-{{ env.MODE }}
+        tags: |
+          type=raw,value={{date 'YYYY-MM-DDTHH-mm' tz='Asia/Seoul'}}
+
+    - name: Set tag before deploy
+      id: set_tag
+      run: |
+        tag=`echo ${{ steps.meta.outputs.tags }} | cut -d ":" -f2`
+        echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+    - name: Make container image and push
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: dockerfiles/backend/dev/Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        platforms: |
+          linux/arm64
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  Deploy_service:
+    needs:
+    - Build_image_and_push
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::557571393534:role/github-actions
+        aws-region: ap-northeast-2
+
+    - name: Update KubeConfig
+      shell: bash
+      run: aws eks update-kubeconfig --name floatic-cluster --region ap-northeast-2
+
+    - name: Get chart
+      uses: actions/download-artifact@v3
+      with:
+        name: chart
+        path: chart
+
+    - name: Deploy
+      shell: bash
+      run: |
+        helm upgrade -n platform \
+          --reuse-values \
+          --set image.tag=${{ needs.Build_image_and_push.outputs.tag }} \
+          ${{ env.SERVICE_NAME }}-backend-{{ env.MODE }} chart/${{ env.SERVICE_NAME }}

@@ -1,0 +1,94 @@
+replicas: 1
+
+## EXAMPLE
+#  lables:
+#    this-is: a-label
+#    u-can-use: like-this
+podLabels: {}
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+
+image:
+  repository: faklody-dev
+  tag: latest
+  pullPolicy: Always
+
+## EXAMPLE
+# envs:
+# - name: this-is-key
+#   value: this-is-value
+envs: []
+
+## EXAMPLE
+#  resources:
+#    limits:
+#      cpu: 100m
+#      memory: 128Mi
+#    requests:
+#      cpu: 100m
+#      memory: 128Mi
+resources: {}
+
+## You HAVE TO set readinessProbe and lifecycle. If you don't set them, zero-downtime deployment WILL NOT work.
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: 8080
+  initialDelaySeconds: 30
+
+livenessProbe:
+  httpGet:
+    path: /livez
+    port: 8080
+
+lifecycle:
+  preStop:
+    exec:
+      command: [ "/bin/sh", "-c", "sleep 10" ]
+
+port: 8080
+
+## EXAMPLE
+#  extraExposePorts: []
+#  - name: extra-1
+#    port: 8081
+#    protocol: TCP
+#  - name: extra-2
+#    port: 8082
+#    protocol: TCP
+extraExposePorts: []
+
+ingress:
+  enabled: false
+  metadata:
+    annotations:
+      arn: ""
+
+    extraAnnotations: {}
+## EXAMPLE
+#      this-is: a-annotation
+#      u-can-use: like-this
+
+  spec:
+    host: ""
+
+    extraHosts: []
+## EXAMPLE
+#      - host: "this.is.a.host"
+#        http: 
+#          paths:
+#            - path: /
+#              pathType: Prefix
+#              backend:
+#                service:
+#                  name: ssl-redirect
+#                  port:
+#                    name: use-annotation
+#            - path: /
+#              pathType: Prefix
+#              backend:
+#                service:
+#                  name: something
+#                  port:
+#                    number: 8080

@@ -92,7 +92,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: chart
-        path: chart
+        path: chart/${{ env.SERVICE_NAME }}
 
     - name: Deploy
       shell: bash

@@ -1,4 +1,4 @@
-package vrobot
+package core
 
 import (
 	"strconv"

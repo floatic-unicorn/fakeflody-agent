@@ -5,6 +5,7 @@ import (
 	"fakeflody-agent/src/interface/agent"
 	"fakeflody-agent/src/interface/prompt"
 	"fakeflody-agent/src/interface/web"
+	"fakeflody-agent/src/internal/robot"
 	"fakeflody-agent/src/thirdparty"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/fx"
@@ -30,6 +31,7 @@ func providers() []interface{} {
 	return []interface{}{
 		agent.NewFakeFlodyClient,
 		thirdparty.NewRobotInfoService,
+		robot.NewFakeRobotService,
 	}
 }
 

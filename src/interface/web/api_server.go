@@ -5,6 +5,7 @@ import (
 	"fakeflody-agent/src/config"
 	"fakeflody-agent/src/interface/agent"
 	"fakeflody-agent/src/interface/web/router"
+	"fakeflody-agent/src/internal/robot"
 	"fakeflody-agent/src/logger"
 	"fmt"
 	"github.com/gofiber/fiber/v3"
@@ -28,6 +29,7 @@ func Server(
 	lc fx.Lifecycle,
 	conf *config.FakeFlodyConfig,
 	client agent.FlodyClient,
+	fakeRobotSvc robot.IFakeRobotService,
 ) {
 
 	if conf.InterfaceConfig.Web == false {
@@ -39,7 +41,7 @@ func Server(
 	api := NewFiberApiServer(client)
 
 	router.HealthCheckRoute(api.server)
-	router.Route(api.server, client)
+	router.Route(api.server, fakeRobotSvc)
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {

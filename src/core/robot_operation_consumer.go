@@ -1,15 +1,14 @@
-package vrobot
+package core
 
 import (
 	config "fakeflody-agent/src/config"
-	vrobotmsg "fakeflody-agent/src/internal/robot/vrobot/message"
 	"fakeflody-agent/src/logger"
 	kafkautil "fakeflody-agent/src/utils/kafka"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"time"
 )
 
-type OperationEvent interface {
+type IOperationEvent interface {
 	AddRobot(robot *VRobotInfo)
 	Subscribe()
 	Close() error
@@ -18,13 +17,13 @@ type OperationEvent interface {
 type OperationConsumer struct {
 	config          *config.FakeFlodyConfig
 	desiredConsumer *kafka.Consumer
-	reportedService *ReportedProducer
+	reportedService IReportedEvent
 	topic           string
 
 	robot *VRobotInfo
 }
 
-func NewOperationConsumer(cnf *config.FakeFlodyConfig, reportedService *ReportedProducer, topic string) *OperationConsumer {
+func NewOperationConsumer(cnf *config.FakeFlodyConfig, reportedService IReportedEvent, topic string) IOperationEvent {
 	consumer, err := config.NewConsumer(cnf)
 	if err != nil {
 		logger.Fatal(err.Error())
@@ -43,21 +42,21 @@ func (c *OperationConsumer) AddRobot(robot *VRobotInfo) {
 
 func (c *OperationConsumer) Subscribe() {
 	logger.Infof("[%s] 해당 토픽을 구독합니다.", c.topic)
-	kafkautil.Subscribe[vrobotmsg.DesiredEvent](c.topic, c.desiredConsumer, func(msg *vrobotmsg.DesiredEvent) {
+	kafkautil.Subscribe[DesiredEvent](c.topic, c.desiredConsumer, func(msg *DesiredEvent) {
 
 		state, ok := msg.Payload["state"]
 		if !ok {
 			return
 		}
-		robotState := vrobotmsg.RobotOperation(state.(string))
+		robotState := RobotOperation(state.(string))
 
-		if robotState == vrobotmsg.UNPAUSED {
+		if robotState == UNPAUSED {
 			time.Sleep(1 * time.Second)
 
 			logger.WInfof("🤖[%v] 명령을 처리합니다 - %v", c.robot.RobotId, state)
 
 			msg.Header.TimeStamp = time.Now().Unix()
-			msg.Header.Type = vrobotmsg.REPORT.String()
+			msg.Header.Type = REPORT.String()
 
 			c.robot.SetCommandId(msg.Header.CommandId)
 			c.robot.Recover()

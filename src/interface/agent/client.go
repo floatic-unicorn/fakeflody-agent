@@ -3,7 +3,7 @@ package agent
 import (
 	"context"
 	"fakeflody-agent/src/config"
-	"fakeflody-agent/src/internal/robot/vrobot"
+	"fakeflody-agent/src/core"
 	"fakeflody-agent/src/logger"
 	"fakeflody-agent/src/thirdparty"
 	"fakeflody-agent/src/utils"
@@ -18,13 +18,13 @@ type FlodyClient interface {
 	Stop() error
 	AddRobot(robotId int, memo string) error
 	RemoveRobot(robotId int)
-	GetRobots() vrobot.VRobotList
-	GetRobotById(robotId int) vrobot.VRobot
+	GetRobots() core.VRobotList
+	GetRobotById(robotId int) core.VRobot
 }
 
 type FakeFlodyClient struct {
 	cnf              *config.FakeFlodyConfig
-	robots           vrobot.VRobotList
+	robots           core.VRobotList
 	robotInfoService thirdparty.RobotInfoService
 }
 
@@ -36,7 +36,7 @@ func NewFakeFlodyClient(
 
 	client := &FakeFlodyClient{
 		cnf:              cnf,
-		robots:           vrobot.NewRobots(),
+		robots:           core.NewRobots(),
 		robotInfoService: robotInfoService,
 	}
 
@@ -78,10 +78,8 @@ func (c *FakeFlodyClient) AddRobot(robotId int, memo string) error {
 		return err
 	}
 
-	bootRobot := vrobot.NewRobot(robotId, robotName, memo, c.cnf)
+	bootRobot := core.NewRobot(robotId, robotName, memo, c.cnf)
 	utils.Cache.Set(strconv.Itoa(robotId), robotId, cache.DefaultExpiration)
-
-	utils.Cache.GetWithExpiration(strconv.Itoa(robotId))
 
 	c.robots = append(c.robots, bootRobot)
 	go bootRobot.Boot()
@@ -99,11 +97,11 @@ func (c *FakeFlodyClient) RemoveRobot(robotId int) {
 	}
 }
 
-func (c *FakeFlodyClient) GetRobots() vrobot.VRobotList {
+func (c *FakeFlodyClient) GetRobots() core.VRobotList {
 	return c.robots
 }
 
-func (c *FakeFlodyClient) GetRobotById(robotId int) vrobot.VRobot {
+func (c *FakeFlodyClient) GetRobotById(robotId int) core.VRobot {
 	return c.robots.GetVRobotById(robotId)
 }
 

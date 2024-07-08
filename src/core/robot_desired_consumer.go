@@ -1,15 +1,14 @@
-package vrobot
+package core
 
 import (
 	config "fakeflody-agent/src/config"
-	vrobotmsg "fakeflody-agent/src/internal/robot/vrobot/message"
 	"fakeflody-agent/src/logger"
 	kafkautil "fakeflody-agent/src/utils/kafka"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"time"
 )
 
-type DesiredEvent interface {
+type IDesiredEvent interface {
 	AddRobot(robot *VRobotInfo)
 	Subscribe()
 	Close() error
@@ -18,13 +17,13 @@ type DesiredEvent interface {
 type DesiredConsumer struct {
 	config           *config.FakeFlodyConfig
 	desiredConsumer  *kafka.Consumer
-	reportedProducer *ReportedProducer
+	reportedProducer IReportedEvent
 	topic            string
 
 	robot *VRobotInfo
 }
 
-func NewDesiredConsumer(cnf *config.FakeFlodyConfig, reportedService *ReportedProducer, topic string) *DesiredConsumer {
+func NewDesiredConsumer(cnf *config.FakeFlodyConfig, reportedService IReportedEvent, topic string) IDesiredEvent {
 	consumer, err := config.NewConsumer(cnf)
 	if err != nil {
 		logger.WErrorf(err.Error())
@@ -43,13 +42,13 @@ func (c *DesiredConsumer) AddRobot(robot *VRobotInfo) {
 
 func (c *DesiredConsumer) Subscribe() {
 	logger.Infof("[%s] 해당 토픽을 구독합니다.", c.topic)
-	kafkautil.Subscribe[vrobotmsg.DesiredEvent](c.topic, c.desiredConsumer, func(msg *vrobotmsg.DesiredEvent) {
+	kafkautil.Subscribe[DesiredEvent](c.topic, c.desiredConsumer, func(msg *DesiredEvent) {
 		state, ok := msg.Payload["state"]
 		if !ok {
 			return
 		}
-		robotState := vrobotmsg.RobotCommand(state.(string))
-		nextStates := vrobotmsg.NextReports(robotState)
+		robotState := RobotCommand(state.(string))
+		nextStates := NextReports(robotState)
 
 		for i, state := range nextStates {
 
@@ -67,10 +66,10 @@ func (c *DesiredConsumer) Subscribe() {
 			}
 
 			msg.Header.TimeStamp = time.Now().Unix()
-			msg.Header.Type = vrobotmsg.RESPONSE.String()
+			msg.Header.Type = RESPONSE.String()
 			msg.Payload["state"] = state.String()
 
-			c.reportedProducer.SendReport(&vrobotmsg.ReportedEvent{
+			c.reportedProducer.SendReport(&ReportedEvent{
 				Header:  msg.Header,
 				Payload: msg.Payload,
 			})

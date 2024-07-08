@@ -5,6 +5,7 @@ import (
 	"fakeflody-agent/src/config"
 	"fakeflody-agent/src/interface/agent"
 	"fakeflody-agent/src/logger"
+	"fakeflody-agent/src/utils"
 	"github.com/cqroot/prompt"
 	"github.com/cqroot/prompt/choose"
 	"go.uber.org/fx"
@@ -132,14 +133,15 @@ func (p *Prompt) Run() error {
 					logger.Infof("🕹️로봇 상태: %s", robotInfo.State)
 
 					var estopText string
-					if robotInfo.Estop {
+					if robotInfo.EmergencyStop.Estop {
 						estopText = "🔴(E-Stop 해제필요)"
 					} else {
 						estopText = "🔵"
 					}
+					_, endTime, _ := utils.Cache.GetWithExpiration(strconv.Itoa(robotInfo.RobotId))
 					logger.Infof("🕹️로봇 가용상태: %s", estopText)
 					logger.Infof("🕹️로봇 메모: %s", robotInfo.Memo)
-					logger.Infof("🕹️남은 세션: %s", robotInfo.SessionEndAt)
+					logger.Infof("🕹️남은 세션: %s", endTime)
 					logger.Info("========================================")
 				}
 			default:

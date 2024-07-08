@@ -1,4 +1,4 @@
-package message
+package core
 
 // RobotCommand enum
 type RobotCommand string

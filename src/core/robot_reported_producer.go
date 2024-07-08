@@ -1,21 +1,20 @@
-package vrobot
+package core
 
 import (
 	"encoding/json"
 	config "fakeflody-agent/src/config"
-	"fakeflody-agent/src/internal/robot/vrobot/message"
 	"fakeflody-agent/src/logger"
 	"fakeflody-agent/src/utils/hashids"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"time"
 )
 
-type ReportedEvent interface {
+type IReportedEvent interface {
 	AddRobot(robot *VRobotInfo)
 	EStop(robotId int)
 	UnPauseSuccess(robotId int)
 	UnPauseFail(robotId int)
-	SendReport(event *message.ReportedEvent)
+	SendReport(event *ReportedEvent)
 	Close()
 }
 
@@ -27,7 +26,7 @@ type ReportedProducer struct {
 	robot *VRobotInfo
 }
 
-func NewReportedProducer(cnf *config.FakeFlodyConfig, topic string) *ReportedProducer {
+func NewReportedProducer(cnf *config.FakeFlodyConfig, topic string) IReportedEvent {
 	producer, err := config.NewProducer(cnf)
 	if err != nil {
 		logger.Errorf(err.Error())
@@ -46,12 +45,12 @@ func (c *ReportedProducer) AddRobot(robot *VRobotInfo) {
 
 func (c *ReportedProducer) EStop(robotId int) {
 
-	receiveState := message.EMERGENCY_STOPPED
+	receiveState := EMERGENCY_STOPPED
 
-	eventMessage := &message.ReportedEvent{
-		Header: message.Header{
+	eventMessage := &ReportedEvent{
+		Header: Header{
 			TimeStamp: time.Now().UnixMilli(),
-			Type:      message.REPORT.String(),
+			Type:      REPORT.String(),
 			RobotId:   hashids.ToUid(robotId),
 		},
 		Payload: map[string]interface{}{
@@ -66,13 +65,13 @@ func (c *ReportedProducer) EStop(robotId int) {
 
 func (c *ReportedProducer) UnPauseSuccess(robotId int) {
 
-	receiveState := message.RECOVERED_FROM_EMERGENCY_STOP
+	receiveState := RECOVERED_FROM_EMERGENCY_STOP
 
-	eventMessage := &message.ReportedEvent{
-		Header: message.Header{
+	eventMessage := &ReportedEvent{
+		Header: Header{
 			CommandId: c.robot.LatestCommandId,
 			TimeStamp: time.Now().UnixMilli(),
-			Type:      message.REPORT.String(),
+			Type:      REPORT.String(),
 			RobotId:   hashids.ToUid(robotId),
 		},
 		Payload: map[string]interface{}{
@@ -87,13 +86,13 @@ func (c *ReportedProducer) UnPauseSuccess(robotId int) {
 
 func (c *ReportedProducer) UnPauseFail(robotId int) {
 
-	receiveState := message.FAILED_TO_UNPAUSE
+	receiveState := FAILED_TO_UNPAUSE
 
-	eventMessage := &message.ReportedEvent{
-		Header: message.Header{
+	eventMessage := &ReportedEvent{
+		Header: Header{
 			CommandId: c.robot.LatestCommandId,
 			TimeStamp: time.Now().UnixMilli(),
-			Type:      message.REPORT.String(),
+			Type:      REPORT.String(),
 			RobotId:   hashids.ToUid(robotId),
 		},
 		Payload: map[string]interface{}{
@@ -107,7 +106,7 @@ func (c *ReportedProducer) UnPauseFail(robotId int) {
 	logger.WWarnf("🤖[%v] estop 해제가 필요합니다", robotId)
 }
 
-func (c *ReportedProducer) SendReport(event *message.ReportedEvent) {
+func (c *ReportedProducer) SendReport(event *ReportedEvent) {
 	value, _ := json.Marshal(&event)
 
 	msg := &kafka.Message{

@@ -1,4 +1,4 @@
-package message
+package robot
 
 type BootRobotRequest struct {
 	RobotId int    `json:"robotId"`
@@ -17,6 +17,6 @@ type GetRobotResult struct {
 	Estop          bool     `json:"estop"`
 	Problems       []string `json:"problems"`
 	Solutions      []string `json:"solutions"`
-	SessionStartAt string   `json:"sessionStartAt"`
-	SessionEndAt   string   `json:"sessionEndAt"`
+	SessionStartAt int64    `json:"sessionStartAt"`
+	SessionEndAt   int64    `json:"sessionEndAt"`
 }

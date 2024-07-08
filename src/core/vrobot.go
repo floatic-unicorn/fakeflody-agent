@@ -1,12 +1,9 @@
-package vrobot
+package core
 
 import (
 	config "fakeflody-agent/src/config"
-	"fakeflody-agent/src/internal/robot/vrobot/message"
 	"fakeflody-agent/src/logger"
-	utils2 "fakeflody-agent/src/utils"
 	"fakeflody-agent/src/utils/kafka"
-	"strconv"
 	"time"
 )
 
@@ -17,7 +14,7 @@ type VRobot interface {
 	IsReady() bool
 
 	GetRobotId() int
-	GetInfo() message.GetRobotResult
+	GetInfo() *VRobotInfo
 
 	UpdateState(state string, LatestCommandId *string)
 	SetCommandId(LatestCommandId *string)
@@ -33,12 +30,13 @@ type VRobotInfo struct {
 	State            string                  `json:"state"`
 	LatestCommandId  *string                 `json:"latestCommandId"`
 	Memo             string                  `json:"memo"`
+	ResponseSec      int                     `json:"responseSec"`
 	SessionStartedAt time.Time               `json:"sessionStartedAt"`
 
 	// events
-	desiredEvent   DesiredEvent
-	operationEvent OperationEvent
-	reportedEvent  ReportedEvent
+	desiredEvent   IDesiredEvent
+	operationEvent IOperationEvent
+	reportedEvent  IReportedEvent
 }
 
 // 에러 상태
@@ -69,7 +67,7 @@ func NewRobot(robotId int, robotName string, memo string, cnf *config.FakeFlodyC
 	robot := &VRobotInfo{
 		RobotId:        robotId,
 		RobotName:      robotName,
-		State:          "BOOT",
+		State:          "BOOTED",
 		Memo:           memo,
 		desiredEvent:   desiredConsumer,
 		operationEvent: operationConsumer,
@@ -136,25 +134,10 @@ func (r *VRobotInfo) IsReady() bool {
 	return r.EmergencyStop.Estop == false
 }
 
-func (r *VRobotInfo) GetInfo() message.GetRobotResult {
-	_, endTime, _ := utils2.Cache.GetWithExpiration(strconv.Itoa(r.RobotId))
-	return message.GetRobotResult{
-		RobotId:        r.RobotId,
-		RobotName:      r.RobotName,
-		Memo:           r.Memo,
-		State:          r.State,
-		Estop:          r.EmergencyStop.Estop,
-		Problems:       r.EmergencyStop.Problems,
-		Solutions:      r.EmergencyStop.Solutions,
-		SessionStartAt: utils2.TimeToStringDateTime(r.SessionStartedAt),
-		SessionEndAt:   utils2.TimeToStringDateTime(endTime),
-	}
+func (r *VRobotInfo) GetInfo() *VRobotInfo {
+	return r
 }
 
 func (r *VRobotInfo) GetRobotId() int {
 	return r.RobotId
-}
-
-func (r *VRobotInfo) Refresh() {
-	r.SessionStartedAt = time.Now()
 }

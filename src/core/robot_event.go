@@ -1,4 +1,4 @@
-package message
+package core
 
 type ReportedEvent struct {
 	Header  Header                 `json:"header"`

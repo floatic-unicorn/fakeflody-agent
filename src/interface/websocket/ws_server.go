@@ -7,6 +7,13 @@ import (
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
+	"sync"
+)
+
+// Global map to store active WebSocket connections
+var (
+	connections = make(map[int]map[*websocket.Conn]bool)
+	mu          sync.Mutex
 )
 
 type WebSocketServer struct {
@@ -18,6 +25,14 @@ func NewWebSocketServer(
 	server *web.FiberApiServer,
 	robotEventOutput core.RobotEventOutput,
 ) {
+	cfg := websocket.Config{
+		RecoverHandler: func(conn *websocket.Conn) {
+			if err := recover(); err != nil {
+				conn.WriteJSON(fiber.Map{"customError": "error occurred", "error": err})
+			}
+		},
+	}
+
 	server.Server.Use("/v1/ws", func(c *fiber.Ctx) error {
 		// IsWebSocketUpgrade returns true if the client
 		// requested upgrade to the WebSocket protocol.
@@ -27,18 +42,39 @@ func NewWebSocketServer(
 		}
 		return fiber.ErrUpgradeRequired
 	})
+
 	server.Server.Get("/v1/ws/robots/:robotId", websocket.New(func(c *websocket.Conn) {
 		robotId := getParamsToInt(c, "robotId")
+
+		mu.Lock()
+		if connections[robotId] == nil {
+			connections[robotId] = make(map[*websocket.Conn]bool)
+		}
+		connections[robotId][c] = true
+		mu.Unlock()
+
+		defer func() {
+			mu.Lock()
+			delete(connections[robotId], c)
+			mu.Unlock()
+			c.Close()
+		}()
+
 		for {
-			msg := <-robotEventOutput.GetChannel(robotId)
-			logger.Infof("메시지 전달 %v, %+v", robotId, msg)
-			if msg.RobotId == robotId {
-				if err := c.WriteJSON(msg); err != nil {
+			msg := <-robotEventOutput.GetChannel()
+			logger.Infof("메시지 전달 %v, %+v", msg.RobotId, msg)
+
+			mu.Lock()
+			conns := connections[msg.RobotId]
+			mu.Unlock()
+
+			for conn := range conns {
+				if err := conn.WriteJSON(msg); err != nil {
 					logger.Error(err.Error())
 				}
 			}
 		}
-	}))
+	}, cfg))
 }
 
 func getParamsToInt(c *websocket.Conn, name string) int {

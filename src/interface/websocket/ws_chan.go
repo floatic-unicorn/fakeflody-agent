@@ -17,23 +17,22 @@ func NewWebSocketQueue() core.RobotEventOutput {
 	}
 }
 
-func (svc *RobotWebSocketChannel) Notify(msg *core.VRobotInfo) {
-	robotInfo := msg
-	_, endTime, _ := utils.Cache.GetWithExpiration(strconv.Itoa(msg.RobotId))
+func (svc *RobotWebSocketChannel) Notify(vrobot *core.VRobotInfo) {
+	_, endTime, _ := utils.Cache.GetWithExpiration(strconv.Itoa(vrobot.RobotId))
 	svc.Channel <- message.GetRobotResult{
-		RobotId:        robotInfo.RobotId,
-		RobotName:      robotInfo.RobotName,
-		Memo:           robotInfo.Memo,
-		State:          robotInfo.State,
-		Estop:          robotInfo.EmergencyStop.Estop,
-		Problems:       robotInfo.EmergencyStop.Problems,
-		Solutions:      robotInfo.EmergencyStop.Solutions,
-		SessionStartAt: robotInfo.SessionStartedAt.UnixMilli(),
+		RobotId:        vrobot.RobotId,
+		RobotName:      vrobot.RobotName,
+		Memo:           vrobot.Memo,
+		State:          vrobot.State,
+		Estop:          vrobot.EmergencyStop.Estop,
+		Problems:       vrobot.EmergencyStop.Problems,
+		Solutions:      vrobot.EmergencyStop.Solutions,
+		SessionStartAt: vrobot.SessionStartedAt.UnixMilli(),
 		SessionEndAt:   endTime.UnixMilli(),
 	}
 }
 
-func (svc *RobotWebSocketChannel) GetChannel(robotId int) <-chan message.GetRobotResult {
+func (svc *RobotWebSocketChannel) GetChannel() <-chan message.GetRobotResult {
 	return svc.Channel
 }
 

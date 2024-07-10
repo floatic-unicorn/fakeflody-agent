@@ -55,14 +55,14 @@ func (c *DesiredConsumer) Subscribe() {
 			time.Sleep(time.Duration(c.config.ResponseTime) * time.Second)
 
 			if !c.robot.IsReady() {
-				logger.WWarnf("🤖[%v] 로봇의 estop 해제가 필요합니다 - %v", c.robot.RobotId, robotState.String())
+				logger.WWarnf("🤖[%v] 로봇의 estop 해제가 필요합니다 - %v", c.robot.RobotId, state.String())
 				return
 			}
 
 			if i == 0 {
-				logger.WInfof("🤖[%v] 로봇이 출발합니다 - %v", c.robot.RobotId, robotState.String())
+				logger.WInfof("🤖[%v] 로봇이 출발합니다 - %v", c.robot.RobotId, state.String())
 			} else {
-				logger.WInfof("🤖[%v] 로봇이 도착했습니다 - %v", c.robot.RobotId, robotState.String())
+				logger.WInfof("🤖[%v] 로봇이 도착했습니다 - %v", c.robot.RobotId, state.String())
 			}
 
 			msg.Header.TimeStamp = time.Now().Unix()

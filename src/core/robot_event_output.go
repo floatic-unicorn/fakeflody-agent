@@ -6,5 +6,5 @@ import (
 
 type RobotEventOutput interface {
 	Notify(message *VRobotInfo)
-	GetChannel(robotId int) <-chan message.GetRobotResult
+	GetChannel() <-chan message.GetRobotResult
 }

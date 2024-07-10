@@ -1,4 +1,4 @@
-package robot
+package message
 
 type BootRobotRequest struct {
 	RobotId int    `json:"robotId"`
@@ -19,4 +19,11 @@ type GetRobotResult struct {
 	Solutions      []string `json:"solutions"`
 	SessionStartAt int64    `json:"sessionStartAt"`
 	SessionEndAt   int64    `json:"sessionEndAt"`
+}
+
+type GetRobotInfoResult struct {
+	RobotID     int    `json:"robotId"`
+	Name        string `json:"name"`
+	Status      string `json:"status"`
+	WarehouseID int    `json:"warehouseId"`
 }

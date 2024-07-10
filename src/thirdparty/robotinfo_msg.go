@@ -7,6 +7,7 @@ import (
 type RobotInfoResponse struct {
 	RobotID  string `json:"robotId"`
 	Name     string `json:"name"`
+	Status   string `json:"status"`
 	RobotJob struct {
 		Type         string    `json:"type"`
 		RobotTag     int       `json:"robotTag"`

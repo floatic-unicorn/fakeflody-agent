@@ -5,4 +5,4 @@ import (
 	"time"
 )
 
-var Cache = cache.New(30*time.Minute, 10*time.Minute)
+var Cache = cache.New(80*time.Minute, 10*time.Minute)

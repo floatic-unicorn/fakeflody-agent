@@ -3,6 +3,7 @@ package robot
 import (
 	"fakeflody-agent/src/config"
 	"fakeflody-agent/src/interface/agent"
+	"fakeflody-agent/src/message"
 	"fakeflody-agent/src/utils"
 	"github.com/gofiber/fiber/v3"
 	"github.com/patrickmn/go-cache"
@@ -10,10 +11,10 @@ import (
 )
 
 type IFakeRobotService interface {
-	Boot(req *BootRobotRequest) error
-	Shutdown(req *ShutDownRobotRequest) error
-	GetRobots() []*GetRobotResult
-	GetRobotById(robotId int) (*GetRobotResult, error)
+	Boot(req *message.BootRobotRequest) error
+	Shutdown(req *message.ShutDownRobotRequest) error
+	GetRobots() []*message.GetRobotResult
+	GetRobotById(robotId int) (*message.GetRobotResult, error)
 	Estop(robotId int) error
 	ClearEstop(robotId int) error
 	RefreshSession(robotId int) error
@@ -35,8 +36,8 @@ func NewFakeRobotService(
 	}
 }
 
-func (svc *FakeRobotService) GetRobots() []*GetRobotResult {
-	robots := make([]*GetRobotResult, 0)
+func (svc *FakeRobotService) GetRobots() []*message.GetRobotResult {
+	robots := make([]*message.GetRobotResult, 0)
 
 	for _, vrobot := range svc.client.GetRobots() {
 		robot, _ := svc.GetRobotById(vrobot.GetRobotId())
@@ -45,7 +46,7 @@ func (svc *FakeRobotService) GetRobots() []*GetRobotResult {
 	return robots
 }
 
-func (svc *FakeRobotService) GetRobotById(robotId int) (*GetRobotResult, error) {
+func (svc *FakeRobotService) GetRobotById(robotId int) (*message.GetRobotResult, error) {
 
 	vrobot := svc.client.GetRobotById(robotId)
 	if vrobot == nil {
@@ -54,7 +55,7 @@ func (svc *FakeRobotService) GetRobotById(robotId int) (*GetRobotResult, error) 
 	robotInfo := vrobot.GetInfo()
 	_, endTime, _ := utils.Cache.GetWithExpiration(strconv.Itoa(robotId))
 
-	return &GetRobotResult{
+	return &message.GetRobotResult{
 		RobotId:        vrobot.GetRobotId(),
 		RobotName:      robotInfo.RobotName,
 		Memo:           robotInfo.Memo,
@@ -77,7 +78,7 @@ func (svc *FakeRobotService) Estop(robotId int) error {
 	return nil
 }
 
-func (svc *FakeRobotService) Boot(req *BootRobotRequest) error {
+func (svc *FakeRobotService) Boot(req *message.BootRobotRequest) error {
 	vrobot := svc.client.GetRobotById(req.RobotId)
 	if vrobot != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Not found Robot")
@@ -100,7 +101,7 @@ func (svc *FakeRobotService) ClearEstop(robotId int) error {
 	return nil
 }
 
-func (svc *FakeRobotService) Shutdown(req *ShutDownRobotRequest) error {
+func (svc *FakeRobotService) Shutdown(req *message.ShutDownRobotRequest) error {
 	vrobot := svc.client.GetRobotById(req.RobotId)
 	if vrobot == nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Not found Robot")

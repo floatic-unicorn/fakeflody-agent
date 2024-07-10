@@ -2,18 +2,21 @@ package router
 
 import (
 	"fakeflody-agent/src/internal/robot"
+	"fakeflody-agent/src/message"
+	"fakeflody-agent/src/thirdparty"
 	"github.com/gofiber/fiber/v3"
 )
 
 func Route(
 	api *fiber.App,
 	fakeRobotSvc robot.IFakeRobotService,
+	robotInfoSvc thirdparty.RobotInfoService,
 ) {
 
 	v1 := api.Group("/v1")
 
 	v1.Post("/robots/boot", func(c fiber.Ctx) error {
-		req := new(robot.BootRobotRequest)
+		req := new(message.BootRobotRequest)
 		if err := c.Bind().Body(req); err != nil {
 			return err
 		}
@@ -29,7 +32,7 @@ func Route(
 	v1.Delete("/robots/:robotId/shutdown", func(c fiber.Ctx) error {
 		robotId := fiber.Params[int](c, "robotId")
 
-		err := fakeRobotSvc.Shutdown(&robot.ShutDownRobotRequest{
+		err := fakeRobotSvc.Shutdown(&message.ShutDownRobotRequest{
 			RobotId: robotId,
 		})
 		if err != nil {
@@ -40,9 +43,14 @@ func Route(
 	})
 
 	v1.Get("/robots", func(c fiber.Ctx) error {
-
 		return c.JSON(fakeRobotSvc.GetRobots())
 	})
+
+	v1.Get("/warehouses/:warehouseId/robotInfos", func(c fiber.Ctx) error {
+		warehouseId := fiber.Params[int](c, "warehouseId")
+		return c.JSON(robotInfoSvc.GetRobotInfosByWarehouse(warehouseId))
+	})
+
 	v1.Get("/robots/:robotId", func(c fiber.Ctx) error {
 		robotId := fiber.Params[int](c, "robotId")
 

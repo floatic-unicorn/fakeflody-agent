@@ -7,6 +7,7 @@ import (
 	"fakeflody-agent/src/interface/web/router"
 	"fakeflody-agent/src/internal/robot"
 	"fakeflody-agent/src/logger"
+	"fakeflody-agent/src/thirdparty"
 	"fmt"
 	"github.com/gofiber/fiber/v3"
 	"go.uber.org/fx"
@@ -30,6 +31,7 @@ func Server(
 	conf *config.FakeFlodyConfig,
 	client agent.FlodyClient,
 	fakeRobotSvc robot.IFakeRobotService,
+	robotInfoSvc thirdparty.RobotInfoService,
 ) {
 
 	if conf.InterfaceConfig.Web == false {
@@ -41,7 +43,7 @@ func Server(
 	api := NewFiberApiServer(client)
 
 	router.HealthCheckRoute(api.server)
-	router.Route(api.server, fakeRobotSvc)
+	router.Route(api.server, fakeRobotSvc, robotInfoSvc)
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {

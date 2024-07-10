@@ -8,7 +8,6 @@ require (
 	github.com/confluentinc/confluent-kafka-go/v2 v2.4.0
 	github.com/cqroot/prompt v0.9.3
 	github.com/gofiber/fiber/v2 v2.52.5
-	github.com/gofiber/fiber/v3 v3.0.0-beta.2
 	github.com/gofiber/swagger v1.1.0
 	github.com/gofiber/utils/v2 v2.0.0-beta.4
 	github.com/jasonlvhit/gocron v0.0.1
@@ -18,7 +17,7 @@ require (
 	github.com/swaggo/swag v1.16.3
 	github.com/urfave/cli/v2 v2.25.7
 	go.uber.org/fx v1.20.0
-	golang.org/x/crypto v0.24.0
+	golang.org/x/crypto v0.25.0
 	gorm.io/gorm v1.25.4
 )
 
@@ -39,10 +38,12 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/cqroot/multichoose v0.1.1 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
+	github.com/fasthttp/websocket v1.5.10 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
 	github.com/go-openapi/spec v0.21.0 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
+	github.com/gofiber/contrib/websocket v1.3.2 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
@@ -59,6 +60,7 @@ require (
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/savsgio/gotils v0.0.0-20240704082632-aef3928b8a38 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.55.0 // indirect
@@ -70,8 +72,9 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.23.0 // indirect
 	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f // indirect
+	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
+	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

@@ -4,7 +4,8 @@ import (
 	"fakeflody-agent/src/internal/robot"
 	"fakeflody-agent/src/message"
 	"fakeflody-agent/src/thirdparty"
-	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v2"
+	"strconv"
 )
 
 func Route(
@@ -15,9 +16,9 @@ func Route(
 
 	v1 := api.Group("/v1")
 
-	v1.Post("/robots/boot", func(c fiber.Ctx) error {
+	v1.Post("/robots/boot", func(c *fiber.Ctx) error {
 		req := new(message.BootRobotRequest)
-		if err := c.Bind().Body(req); err != nil {
+		if err := c.BodyParser(req); err != nil {
 			return err
 		}
 
@@ -29,8 +30,8 @@ func Route(
 		return c.JSON(fakeRobotSvc.GetRobots())
 	})
 
-	v1.Delete("/robots/:robotId/shutdown", func(c fiber.Ctx) error {
-		robotId := fiber.Params[int](c, "robotId")
+	v1.Delete("/robots/:robotId/shutdown", func(c *fiber.Ctx) error {
+		robotId := getParamsToInt(c, "robotId")
 
 		err := fakeRobotSvc.Shutdown(&message.ShutDownRobotRequest{
 			RobotId: robotId,
@@ -42,17 +43,17 @@ func Route(
 		return c.JSON(fakeRobotSvc.GetRobots())
 	})
 
-	v1.Get("/robots", func(c fiber.Ctx) error {
+	v1.Get("/robots", func(c *fiber.Ctx) error {
 		return c.JSON(fakeRobotSvc.GetRobots())
 	})
 
-	v1.Get("/warehouses/:warehouseId/robotInfos", func(c fiber.Ctx) error {
-		warehouseId := fiber.Params[int](c, "warehouseId")
+	v1.Get("/warehouses/:warehouseId/robotInfos", func(c *fiber.Ctx) error {
+		warehouseId := getParamsToInt(c, "warehouseId")
 		return c.JSON(robotInfoSvc.GetRobotInfosByWarehouse(warehouseId))
 	})
 
-	v1.Get("/robots/:robotId", func(c fiber.Ctx) error {
-		robotId := fiber.Params[int](c, "robotId")
+	v1.Get("/robots/:robotId", func(c *fiber.Ctx) error {
+		robotId := getParamsToInt(c, "robotId")
 
 		vrobot, err := fakeRobotSvc.GetRobotById(robotId)
 		if err != nil {
@@ -62,8 +63,8 @@ func Route(
 		return c.JSON(vrobot)
 	})
 
-	v1.Patch("/robots/:robotId/estop", func(c fiber.Ctx) error {
-		robotId := fiber.Params[int](c, "robotId")
+	v1.Patch("/robots/:robotId/estop", func(c *fiber.Ctx) error {
+		robotId := getParamsToInt(c, "robotId")
 
 		err := fakeRobotSvc.Estop(robotId)
 		if err != nil {
@@ -75,8 +76,8 @@ func Route(
 		})
 	})
 
-	v1.Patch("/robots/:robotId/estop/clear", func(c fiber.Ctx) error {
-		robotId := fiber.Params[int](c, "robotId")
+	v1.Patch("/robots/:robotId/estop/clear", func(c *fiber.Ctx) error {
+		robotId := getParamsToInt(c, "robotId")
 
 		err := fakeRobotSvc.ClearEstop(robotId)
 		if err != nil {
@@ -88,8 +89,8 @@ func Route(
 		})
 	})
 
-	v1.Patch("/robots/:robotId/refresh", func(c fiber.Ctx) error {
-		robotId := fiber.Params[int](c, "robotId")
+	v1.Patch("/robots/:robotId/refresh", func(c *fiber.Ctx) error {
+		robotId := getParamsToInt(c, "robotId")
 
 		err := fakeRobotSvc.RefreshSession(robotId)
 		if err != nil {
@@ -100,4 +101,13 @@ func Route(
 			"msg": "success",
 		})
 	})
+}
+
+func getParamsToInt(c *fiber.Ctx, name string) int {
+	param := c.Params(name)
+	numberValue, err := strconv.Atoi(param)
+	if err != nil {
+		return 0
+	}
+	return numberValue
 }

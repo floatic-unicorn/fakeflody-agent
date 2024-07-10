@@ -5,6 +5,7 @@ import (
 	"fakeflody-agent/src/interface/agent"
 	"fakeflody-agent/src/interface/prompt"
 	"fakeflody-agent/src/interface/web"
+	"fakeflody-agent/src/interface/websocket"
 	"fakeflody-agent/src/internal/robot"
 	"fakeflody-agent/src/thirdparty"
 	"github.com/urfave/cli/v2"
@@ -13,7 +14,7 @@ import (
 
 func FakeFlody(ctx *cli.Context, conf *config.FakeFlodyConfig) *fx.App {
 	return fx.New(
-		fx.NopLogger,
+		//fx.NopLogger,
 		fx.Provide(
 			append(
 				providers(),
@@ -32,6 +33,8 @@ func providers() []interface{} {
 		agent.NewFakeFlodyClient,
 		thirdparty.NewRobotInfoService,
 		robot.NewFakeRobotService,
+		web.NewFiberApiServer,
+		websocket.NewWebSocketQueue,
 	}
 }
 
@@ -39,6 +42,7 @@ func invokers() []interface{} {
 	return []interface{}{
 		prompt.NewPrompt,
 		agent.ClientSessionHandler,
+		websocket.NewWebSocketServer,
 		web.Server,
 	}
 }

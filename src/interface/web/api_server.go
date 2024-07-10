@@ -9,27 +9,27 @@ import (
 	"fakeflody-agent/src/logger"
 	"fakeflody-agent/src/thirdparty"
 	"fmt"
-	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v2"
 	"go.uber.org/fx"
 )
 
 type FiberApiServer struct {
-	server          *fiber.App
-	fakeFlodyClient agent.FlodyClient
+	Server          *fiber.App
+	FakeFlodyClient agent.FlodyClient
 }
 
 func NewFiberApiServer(client agent.FlodyClient) *FiberApiServer {
 	server := initializeServer()
 	return &FiberApiServer{
-		server:          server,
-		fakeFlodyClient: client,
+		Server:          server,
+		FakeFlodyClient: client,
 	}
 }
 
 func Server(
 	lc fx.Lifecycle,
+	server *FiberApiServer,
 	conf *config.FakeFlodyConfig,
-	client agent.FlodyClient,
 	fakeRobotSvc robot.IFakeRobotService,
 	robotInfoSvc thirdparty.RobotInfoService,
 ) {
@@ -40,10 +40,10 @@ func Server(
 
 	logger.Info("Starting Web Server")
 
-	api := NewFiberApiServer(client)
+	api := server
 
-	router.HealthCheckRoute(api.server)
-	router.Route(api.server, fakeRobotSvc, robotInfoSvc)
+	router.HealthCheckRoute(api.Server)
+	router.Route(api.Server, fakeRobotSvc, robotInfoSvc)
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {

@@ -61,6 +61,7 @@ func (c *ReportedProducer) EStop(robotId int) {
 	}
 	c.SendReport(eventMessage)
 	c.robot.UpdateState(receiveState.String(), eventMessage.Header.CommandId)
+	c.robot.robotEventOutput.Notify(c.robot)
 }
 
 func (c *ReportedProducer) UnPauseSuccess(robotId int) {
@@ -80,6 +81,7 @@ func (c *ReportedProducer) UnPauseSuccess(robotId int) {
 	}
 	c.SendReport(eventMessage)
 	c.robot.UpdateState(receiveState.String(), eventMessage.Header.CommandId)
+	c.robot.robotEventOutput.Notify(c.robot)
 
 	logger.WInfof("🤖[%v] 복구가 완료되었습니다", robotId)
 }
@@ -102,6 +104,7 @@ func (c *ReportedProducer) UnPauseFail(robotId int) {
 	}
 	c.SendReport(eventMessage)
 	c.robot.UpdateState(receiveState.String(), eventMessage.Header.CommandId)
+	c.robot.robotEventOutput.Notify(c.robot)
 
 	logger.WWarnf("🤖[%v] estop 해제가 필요합니다", robotId)
 }

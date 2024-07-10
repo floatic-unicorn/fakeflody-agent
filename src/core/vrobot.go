@@ -37,6 +37,8 @@ type VRobotInfo struct {
 	desiredEvent   IDesiredEvent
 	operationEvent IOperationEvent
 	reportedEvent  IReportedEvent
+
+	robotEventOutput RobotEventOutput
 }
 
 // 에러 상태
@@ -46,7 +48,7 @@ type RobotEmergencyStopState struct {
 	Problems  []string `json:"problems"`
 }
 
-func NewRobot(robotId int, robotName string, memo string, cnf *config.FakeFlodyConfig) VRobot {
+func NewRobot(robotId int, robotName string, memo string, cnf *config.FakeFlodyConfig, robotEventOutput RobotEventOutput) VRobot {
 	topics := config.NewTopicConfig(cnf.Env, robotId)
 	adminClinet, err := config.NewAdmin(cnf)
 	if err == nil {
@@ -77,6 +79,7 @@ func NewRobot(robotId int, robotName string, memo string, cnf *config.FakeFlodyC
 			Solutions: []string{},
 			Problems:  []string{},
 		},
+		robotEventOutput: robotEventOutput,
 		SessionStartedAt: time.Now(),
 	}
 

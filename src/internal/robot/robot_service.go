@@ -2,10 +2,11 @@ package robot
 
 import (
 	"fakeflody-agent/src/config"
+	"fakeflody-agent/src/core"
 	"fakeflody-agent/src/interface/agent"
 	"fakeflody-agent/src/message"
 	"fakeflody-agent/src/utils"
-	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v2"
 	"github.com/patrickmn/go-cache"
 	"strconv"
 )
@@ -22,8 +23,9 @@ type IFakeRobotService interface {
 
 // FakeRobotService interface
 type FakeRobotService struct {
-	config *config.FakeFlodyConfig
-	client agent.FlodyClient
+	config     *config.FakeFlodyConfig
+	client     agent.FlodyClient
+	robotEvent core.RobotEventOutput
 }
 
 func NewFakeRobotService(

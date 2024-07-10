@@ -26,18 +26,21 @@ type FakeFlodyClient struct {
 	cnf              *config.FakeFlodyConfig
 	robots           core.VRobotList
 	robotInfoService thirdparty.RobotInfoService
+	robotEvent       core.RobotEventOutput
 }
 
 func NewFakeFlodyClient(
 	cnf *config.FakeFlodyConfig,
 	lifecycle fx.Lifecycle,
 	robotInfoService thirdparty.RobotInfoService,
+	robotEvent core.RobotEventOutput,
 ) FlodyClient {
 
 	client := &FakeFlodyClient{
 		cnf:              cnf,
 		robots:           core.NewRobots(),
 		robotInfoService: robotInfoService,
+		robotEvent:       robotEvent,
 	}
 
 	lifecycle.Append(fx.Hook{
@@ -78,7 +81,7 @@ func (c *FakeFlodyClient) AddRobot(robotId int, memo string) error {
 		return err
 	}
 
-	bootRobot := core.NewRobot(robotId, robotName, memo, c.cnf)
+	bootRobot := core.NewRobot(robotId, robotName, memo, c.cnf, c.robotEvent)
 	utils.Cache.Set(strconv.Itoa(robotId), robotId, cache.DefaultExpiration)
 
 	c.robots = append(c.robots, bootRobot)

@@ -74,7 +74,7 @@ func (c *DesiredConsumer) Subscribe() {
 				Payload: msg.Payload,
 			})
 			c.robot.UpdateState(state.String(), msg.Header.CommandId)
-			c.robot.robotEventOutput.Notify(c.robot)
+			go c.robot.robotEventOutput.Notify(c.robot)
 		}
 	})
 }

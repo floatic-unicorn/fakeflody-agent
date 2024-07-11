@@ -60,7 +60,6 @@ func (c *OperationConsumer) Subscribe() {
 
 			c.robot.SetCommandId(msg.Header.CommandId)
 			c.robot.Recover()
-			c.robot.robotEventOutput.Notify(c.robot)
 		}
 	})
 }

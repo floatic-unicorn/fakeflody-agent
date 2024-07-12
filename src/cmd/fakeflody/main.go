@@ -37,7 +37,7 @@ func main() {
 			FakeFlodyConfig := config.NewFakeFlodyConfig(
 				env,
 				robotIds,
-				ctx.Int(ResponseTimeFlag.Name),
+				ctx.Int(IntervalFlag.Name),
 				config.InterfaceConfig{
 					Web: ctx.Bool(WebFlag.Name),
 					Cli: ctx.Bool(CliFlag.Name),

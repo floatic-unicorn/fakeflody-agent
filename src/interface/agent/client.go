@@ -16,7 +16,7 @@ import (
 type FlodyClient interface {
 	Run() error
 	Stop() error
-	AddRobot(robotId int, memo string) error
+	AddRobot(robotId int, memo string, responseTime int) error
 	RemoveRobot(robotId int)
 	GetRobots() core.VRobotList
 	GetRobotById(robotId int) core.VRobot
@@ -57,7 +57,7 @@ func NewFakeFlodyClient(
 
 func (c *FakeFlodyClient) Run() error {
 	for _, robotId := range c.cnf.RobotIds {
-		err := c.AddRobot(robotId, "초기 설정")
+		err := c.AddRobot(robotId, "초기 설정", c.cnf.ResponseTime)
 		if err != nil {
 			logger.WWarnf("가상로봇 추가에 실패하였습니다 error: %v", err)
 		}
@@ -75,13 +75,17 @@ func (c *FakeFlodyClient) Stop() error {
 	return nil
 }
 
-func (c *FakeFlodyClient) AddRobot(robotId int, memo string) error {
+func (c *FakeFlodyClient) AddRobot(robotId int, memo string, interval int) error {
 	robotName, err := c.getRobotByRobotName(robotId)
 	if err != nil {
 		return err
 	}
 
-	bootRobot := core.NewRobot(robotId, robotName, memo, c.cnf, c.robotEvent)
+	if interval <= 0 {
+		interval = c.cnf.ResponseTime
+	}
+
+	bootRobot := core.NewRobot(robotId, robotName, memo, interval, c.cnf, c.robotEvent)
 	utils.Cache.Set(strconv.Itoa(robotId), robotId, cache.DefaultExpiration)
 
 	c.robots = append(c.robots, bootRobot)

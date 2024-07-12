@@ -71,9 +71,7 @@ func Route(
 			return c.Status(fiber.StatusBadRequest).JSON(err)
 		}
 
-		return c.JSON(fiber.Map{
-			"msg": "success",
-		})
+		return defaultResponse(c)
 	})
 
 	v1.Patch("/robots/:robotId/estop/clear", func(c *fiber.Ctx) error {
@@ -84,9 +82,23 @@ func Route(
 			return c.Status(fiber.StatusBadRequest).JSON(err)
 		}
 
-		return c.JSON(fiber.Map{
-			"msg": "success",
-		})
+		return defaultResponse(c)
+	})
+
+	v1.Patch("/robots/estop", func(c *fiber.Ctx) error {
+		err := fakeRobotSvc.AllEstop()
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(err)
+		}
+		return defaultResponse(c)
+	})
+
+	v1.Patch("/robots/estop/clear", func(c *fiber.Ctx) error {
+		err := fakeRobotSvc.AllClearEstop()
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(err)
+		}
+		return defaultResponse(c)
 	})
 
 	v1.Patch("/robots/:robotId/refresh", func(c *fiber.Ctx) error {
@@ -97,9 +109,7 @@ func Route(
 			return c.Status(fiber.StatusBadRequest).JSON(err)
 		}
 
-		return c.JSON(fiber.Map{
-			"msg": "success",
-		})
+		return defaultResponse(c)
 	})
 }
 
@@ -110,4 +120,10 @@ func getParamsToInt(c *fiber.Ctx, name string) int {
 		return 0
 	}
 	return numberValue
+}
+
+func defaultResponse(c *fiber.Ctx) error {
+	return c.JSON(fiber.Map{
+		"msg": "success",
+	})
 }

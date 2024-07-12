@@ -27,6 +27,7 @@ func (svc *RobotWebSocketChannel) Notify(vrobot *core.VRobotInfo) {
 		Estop:          vrobot.EmergencyStop.Estop,
 		Problems:       vrobot.EmergencyStop.Problems,
 		Solutions:      vrobot.EmergencyStop.Solutions,
+		Interval:       vrobot.Interval,
 		SessionStartAt: vrobot.SessionStartedAt.UnixMilli(),
 		SessionEndAt:   endTime.UnixMilli(),
 	}

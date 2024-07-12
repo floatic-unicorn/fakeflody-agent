@@ -30,7 +30,7 @@ type VRobotInfo struct {
 	State            string                  `json:"state"`
 	LatestCommandId  *string                 `json:"latestCommandId"`
 	Memo             string                  `json:"memo"`
-	ResponseSec      int                     `json:"responseSec"`
+	Interval         int                     `json:"interval"`
 	SessionStartedAt time.Time               `json:"sessionStartedAt"`
 
 	// events
@@ -48,7 +48,7 @@ type RobotEmergencyStopState struct {
 	Problems  []string `json:"problems"`
 }
 
-func NewRobot(robotId int, robotName string, memo string, cnf *config.FakeFlodyConfig, robotEventOutput RobotEventOutput) VRobot {
+func NewRobot(robotId int, robotName string, memo string, interval int, cnf *config.FakeFlodyConfig, robotEventOutput RobotEventOutput) VRobot {
 	topics := config.NewTopicConfig(cnf.Env, robotId)
 	adminClinet, err := config.NewAdmin(cnf)
 	if err == nil {
@@ -80,6 +80,7 @@ func NewRobot(robotId int, robotName string, memo string, cnf *config.FakeFlodyC
 			Problems:  []string{},
 		},
 		robotEventOutput: robotEventOutput,
+		Interval:         interval,
 		SessionStartedAt: time.Now(),
 	}
 

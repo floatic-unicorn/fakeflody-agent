@@ -51,7 +51,7 @@ func (c *OperationConsumer) Subscribe() {
 		robotState := RobotOperation(state.(string))
 
 		if robotState == UNPAUSED {
-			time.Sleep(1 * time.Second)
+			time.Sleep(time.Duration(c.robot.Interval) * time.Second)
 
 			logger.WInfof("🤖[%v] 명령을 처리합니다 - %v", c.robot.RobotId, state)
 

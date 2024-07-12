@@ -1,8 +1,9 @@
 package message
 
 type BootRobotRequest struct {
-	RobotId int    `json:"robotId"`
-	Memo    string `json:"memo"`
+	RobotId  int    `json:"robotId"`
+	Memo     string `json:"memo"`
+	Interval int    `json:"interval"`
 }
 
 type ShutDownRobotRequest struct {
@@ -17,6 +18,7 @@ type GetRobotResult struct {
 	Estop          bool     `json:"estop"`
 	Problems       []string `json:"problems"`
 	Solutions      []string `json:"solutions"`
+	Interval       int      `json:"interval"`
 	SessionStartAt int64    `json:"sessionStartAt"`
 	SessionEndAt   int64    `json:"sessionEndAt"`
 }

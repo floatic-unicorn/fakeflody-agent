@@ -5,7 +5,7 @@ import "github.com/urfave/cli/v2"
 var Flags = []cli.Flag{
 	EnvFlag,
 	RobotIdFlag,
-	ResponseTimeFlag,
+	IntervalFlag,
 	LogLevelFlag,
 	WebFlag,
 	WebPortFlag,
@@ -34,8 +34,8 @@ var RobotIdFlag = &cli.IntSliceFlag{
 	Usage:   "robotId 설정",
 }
 
-var ResponseTimeFlag = &cli.IntFlag{
-	Name:        "sec",
+var IntervalFlag = &cli.IntFlag{
+	Name:        "interval",
 	Aliases:     []string{"t"},
 	DefaultText: "2",
 	Value:       2,

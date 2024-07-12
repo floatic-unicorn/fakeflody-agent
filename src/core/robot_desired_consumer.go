@@ -1,6 +1,7 @@
 package core
 
 import (
+	"errors"
 	config "fakeflody-agent/src/config"
 	"fakeflody-agent/src/logger"
 	kafkautil "fakeflody-agent/src/utils/kafka"
@@ -52,17 +53,9 @@ func (c *DesiredConsumer) Subscribe() {
 
 		for i, state := range nextStates {
 
-			time.Sleep(time.Duration(c.config.ResponseTime) * time.Second)
-
-			if !c.robot.IsReady() {
-				logger.WWarnf("🤖[%v] 로봇의 estop 해제가 필요합니다 - %v", c.robot.RobotId, state.String())
+			validRobotStatusErr := c.validRobotStatus(i, state)
+			if validRobotStatusErr != nil {
 				return
-			}
-
-			if i == 0 {
-				logger.WInfof("🤖[%v] 로봇이 출발합니다 - %v", c.robot.RobotId, state.String())
-			} else {
-				logger.WInfof("🤖[%v] 로봇이 도착했습니다 - %v", c.robot.RobotId, state.String())
 			}
 
 			msg.Header.TimeStamp = time.Now().Unix()
@@ -81,4 +74,26 @@ func (c *DesiredConsumer) Subscribe() {
 
 func (c *DesiredConsumer) Close() error {
 	return c.desiredConsumer.Close()
+}
+
+func (c *DesiredConsumer) validRobotStatus(seq int, state RobotReportState) error {
+	if seq == 0 { // start
+		time.Sleep(1 * time.Second)
+
+		if !c.robot.IsReady() {
+			logger.WWarnf("🤖[%v] 로봇의 estop 해제가 필요합니다 - %v", c.robot.RobotId, state.String())
+			return errors.New("🤖 로봇의 estop 해제가 필요합니다")
+		}
+		logger.WInfof("🤖[%v] 로봇이 출발합니다 - %v", c.robot.RobotId, state.String())
+	} else { // end
+		time.Sleep(time.Duration(c.robot.Interval) * time.Second)
+
+		if !c.robot.IsReady() {
+			logger.WWarnf("🤖[%v] 로봇의 estop 해제가 필요합니다 - %v", c.robot.RobotId, state.String())
+			return errors.New("🤖 로봇의 estop 해제가 필요합니다")
+		}
+		logger.WInfof("🤖[%v] 로봇이 도착했습니다 - %v", c.robot.RobotId, state.String())
+	}
+
+	return nil
 }
